@@ -61,6 +61,13 @@ class DBClient {
     const findResult = await collection.find(new ObjectId(`${id}`)).toArray();
     return findResult;
   }
+
+  async findFilesByPID(id) {
+    this.db = this.client.db(database);
+    const collection = this.db.collection('files');
+    const findResult = await collection.find(new ObjectId(`${id}`)).toArray();
+    return findResult;
+  }
 }
 
 const dbClient = new DBClient();
