@@ -68,6 +68,49 @@ class DBClient {
     const findResult = await collection.find(new ObjectId(`${id}`)).toArray();
     return findResult;
   }
+
+  async findFilesByUID(uid) {
+    this.db = this.client.db(database);
+    const collection = this.db.collection('files');
+    const findResult = await collection.find({
+      userId: uid,
+    }).toArray();
+    return findResult;
+  }
+
+  async findFilesByIdUID(id, uid) {
+    this.db = this.client.db(database);
+    const collection = this.db.collection('files');
+    const findResult = await collection.find({
+      _id: new ObjectId(`${id}`),
+      userId: uid,
+    }).toArray();
+    return findResult;
+  }
+
+  async findFilesAgg(query, page) {
+    this.db = this.client.db(database);
+    const collection = this.db.collection('files');
+    const findResult = await collection.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: '$_id',
+          id: { $first: '$_id' },
+          userId: { $first: '$userId' },
+          name: { $first: '$name' },
+          type: { $first: '$type' },
+          isPublic: { $first: '$isPublic' },
+          parentId: { $first: '$parentId' },
+        },
+      },
+      { $sort: { _id: -1 } },
+      { $skip: 20 * page },
+      { $limit: 20 },
+      { $project: { _id: 0 } },
+    ]).toArray();
+    return findResult;
+  }
 }
 
 const dbClient = new DBClient();

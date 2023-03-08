@@ -112,6 +112,57 @@ class FilesController {
       });
     }
   }
+
+  static async getShow(request, response) {
+    const user = await auth.currUser(request);
+    if (!user) {
+      response.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = request.params;
+    if (!id) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+    const userId = user._id.toString();
+    const files = await dbClient.findFilesByIdUID(id, userId);
+    if (files.length < 1) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+    response.status(200).send({
+      id: files[0]._id.toString(),
+      userId: files[0].userId,
+      name: files[0].name,
+      type: files[0].type,
+      isPublic: files[0].isPublic,
+      parentId: files[0].parentId,
+    });
+  }
+
+  static async getIndex(request, response) {
+    const user = await auth.currUser(request);
+    if (!user) {
+      response.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+    const userId = user._id.toString();
+    const { parentId } = request.query;
+    let { page } = request.query;
+
+    if (!parentId) {
+      if (!page) page = 0;
+      const query = { userId: `${userId}` };
+      const files = await dbClient.findFilesAgg(query, page);
+      response.status(200).send(files);
+    } else {
+      if (!page) page = 0;
+      const query = { userId: `${userId}`, parentId: `${parentId}` };
+      const files = await dbClient.findFilesAgg(query, page);
+      response.status(200).send(files);
+    }
+  }
 }
 
 export default FilesController;
