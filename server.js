@@ -4,8 +4,8 @@ import router from './routes/index';
 const app = express();
 
 let port;
-if (process.env.DB_PORT) {
-  port = process.env.DB_PORT;
+if (process.env.PORT) {
+  port = process.env.PORT;
 } else {
   port = 5000;
 }
