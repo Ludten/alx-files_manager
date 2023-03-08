@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 let host;
 let port;
@@ -52,6 +52,13 @@ class DBClient {
     this.db = this.client.db(database);
     const collection = this.db.collection('users');
     const findResult = await collection.find({ email: `${email}` }).toArray();
+    return findResult;
+  }
+
+  async findUserByID(id) {
+    this.db = this.client.db(database);
+    const collection = this.db.collection('users');
+    const findResult = await collection.find(new ObjectId(`${id}`)).toArray();
     return findResult;
   }
 }
