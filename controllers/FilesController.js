@@ -163,6 +163,62 @@ class FilesController {
       response.status(200).send(files);
     }
   }
+
+  static async putPublish(request, response) {
+    const user = await auth.currUser(request);
+    if (!user) {
+      response.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+    const { id } = request.params;
+    if (!id) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+    const userId = user._id.toString();
+    await dbClient.updateFiles(id, userId, true);
+    const files = await dbClient.findFilesByIdUID(id, userId);
+    if (files.length < 1) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+    response.status(200).send({
+      id: files[0]._id.toString(),
+      userId: files[0].userId,
+      name: files[0].name,
+      type: files[0].type,
+      isPublic: files[0].isPublic,
+      parentId: files[0].parentId,
+    });
+  }
+
+  static async putUnpublish(request, response) {
+    const user = await auth.currUser(request);
+    if (!user) {
+      response.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+    const { id } = request.params;
+    if (!id) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+    const userId = user._id.toString();
+    await dbClient.updateFiles(id, userId, false);
+    const files = await dbClient.findFilesByIdUID(id, userId);
+    if (files.length < 1) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+    response.status(200).send({
+      id: files[0]._id.toString(),
+      userId: files[0].userId,
+      name: files[0].name,
+      type: files[0].type,
+      isPublic: files[0].isPublic,
+      parentId: files[0].parentId,
+    });
+  }
 }
 
 export default FilesController;

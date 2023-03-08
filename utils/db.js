@@ -111,6 +111,18 @@ class DBClient {
     ]).toArray();
     return findResult;
   }
+
+  async updateFiles(id, uid, newVal) {
+    this.db = this.client.db(database);
+    const collection = this.db.collection('files');
+    await collection.update(
+      {
+        _id: new ObjectId(`${id}`),
+        userId: uid,
+      },
+      { $set: { isPublic: newVal } },
+    );
+  }
 }
 
 const dbClient = new DBClient();
