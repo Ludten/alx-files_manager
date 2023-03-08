@@ -47,6 +47,13 @@ class DBClient {
     const findResult = await collection.find({}).toArray();
     return findResult.length;
   }
+
+  async findUser(email) {
+    this.db = this.client.db(database);
+    const collection = this.db.collection('users');
+    const findResult = await collection.find({ email: `${email}` }).toArray();
+    return findResult;
+  }
 }
 
 const dbClient = new DBClient();
