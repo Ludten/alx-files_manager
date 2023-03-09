@@ -177,19 +177,18 @@ class FilesController {
       return;
     }
     const userId = user._id.toString();
-    let files = await dbClient.findFilesByIdUID(id, userId);
+    const files = await dbClient.findFilesByIdUID(id, userId);
     if (files.length < 1) {
       response.status(404).send({ error: 'Not found' });
       return;
     }
     await dbClient.updateFiles(id, userId, true);
-    files = await dbClient.findFilesByIdUID(id, userId);
     response.status(200).send({
       id: files[0]._id.toString(),
       userId: files[0].userId,
       name: files[0].name,
       type: files[0].type,
-      isPublic: files[0].isPublic,
+      isPublic: true,
       parentId: files[0].parentId,
     });
   }
@@ -206,19 +205,18 @@ class FilesController {
       return;
     }
     const userId = user._id.toString();
-    let files = await dbClient.findFilesByIdUID(id, userId);
+    const files = await dbClient.findFilesByIdUID(id, userId);
     if (files.length < 1) {
       response.status(404).send({ error: 'Not found' });
       return;
     }
     await dbClient.updateFiles(id, userId, false);
-    files = await dbClient.findFilesByIdUID(id, userId);
     response.status(200).send({
       id: files[0]._id.toString(),
       userId: files[0].userId,
       name: files[0].name,
       type: files[0].type,
-      isPublic: files[0].isPublic,
+      isPublic: false,
       parentId: files[0].parentId,
     });
   }
