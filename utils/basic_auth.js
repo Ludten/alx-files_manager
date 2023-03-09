@@ -6,8 +6,8 @@ const crypto = require('crypto');
 class BasicAuth {
   static authHeader(request = null) {
     if (!request) return null;
-    if (!request.get('Authorization')) return null;
-    return request.get('Authorization');
+    if (!request.get('authorization')) return null;
+    return request.get('authorization');
   }
 
   static extractBaseAuthHdr(authHeader) {
@@ -58,8 +58,8 @@ class BasicAuth {
 
   static tokenHeader(request = null) {
     if (!request) return null;
-    if (!request.get('X-Token')) return null;
-    return request.get('X-Token');
+    if (!request.get('x-token')) return null;
+    return request.get('x-token');
   }
 
   static async extractTokenHdr(token) {
@@ -79,10 +79,10 @@ class BasicAuth {
     return true;
   }
 
-  async currUser(request = null) {
-    const token = this.constructor.tokenHeader(request);
+  static async currUser(request = null) {
+    const token = BasicAuth.tokenHeader(request);
     if (!token) return null;
-    const usrID = await this.constructor.extractTokenHdr(token);
+    const usrID = await BasicAuth.extractTokenHdr(token);
     if (!usrID) return null;
     const usr = await dbClient.findUserByID(usrID);
     if (usr !== []) return usr[0];

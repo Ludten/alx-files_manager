@@ -23,11 +23,9 @@ if (process.env.DB_DATABASE) {
 
 const fileTypes = ['folder', 'file', 'image'];
 
-const auth = new BasicAuth();
-
 class FilesController {
   static async postUpload(request, response) {
-    const user = await auth.currUser(request);
+    const user = await BasicAuth.currUser(request);
     if (!user) {
       response.status(401).send({ error: 'Unauthorized' });
       return;
@@ -115,7 +113,7 @@ class FilesController {
   }
 
   static async getShow(request, response) {
-    const user = await auth.currUser(request);
+    const user = await BasicAuth.currUser(request);
     if (!user) {
       response.status(401).send({ error: 'Unauthorized' });
       return;
@@ -143,7 +141,7 @@ class FilesController {
   }
 
   static async getIndex(request, response) {
-    const user = await auth.currUser(request);
+    const user = await BasicAuth.currUser(request);
     if (!user) {
       response.status(401).send({ error: 'Unauthorized' });
       return;
@@ -166,7 +164,7 @@ class FilesController {
   }
 
   static async putPublish(request, response) {
-    const user = await auth.currUser(request);
+    const user = await BasicAuth.currUser(request);
     if (!user) {
       response.status(401).send({ error: 'Unauthorized' });
       return;
@@ -195,7 +193,7 @@ class FilesController {
   }
 
   static async putUnpublish(request, response) {
-    const user = await auth.currUser(request);
+    const user = await BasicAuth.currUser(request);
     if (!user) {
       response.status(401).send({ error: 'Unauthorized' });
       return;
@@ -236,7 +234,7 @@ class FilesController {
       return;
     }
     const file = files[0];
-    const user = await auth.currUser(request);
+    const user = await BasicAuth.currUser(request);
 
     if (!file.isPublic && (!user || user._id.toString() !== file.userId)) {
       response.status(404).send({ error: 'Not found' });

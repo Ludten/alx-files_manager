@@ -2,8 +2,6 @@ import { v4 as uuidv4 } from 'uuid';
 import BasicAuth from '../utils/basic_auth';
 import redisClient from '../utils/redis';
 
-const auth = new BasicAuth();
-
 class AuthController {
   static async getConnect(request, response) {
     const header = BasicAuth.authHeader(request);
@@ -29,15 +27,15 @@ class AuthController {
   static async getDisconnect(request, response) {
     const token = BasicAuth.tokenHeader(request);
     const bool = await BasicAuth.delTokenHdr(token);
-    if (bool === false) {
+    if (!bool) {
       response.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    response.status(204).send('');
+    response.status(204).send();
   }
 
   static async getMe(request, response) {
-    const user = await auth.currUser(request);
+    const user = await BasicAuth.currUser(request);
     if (!user) {
       response.status(401).send({ error: 'Unauthorized' });
       return;
