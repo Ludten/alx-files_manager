@@ -76,21 +76,21 @@ class DBClient {
     return findResult;
   }
 
-  async findFilesByUID(uid) {
+  async findFilesByUID(userId) {
     this.db = this.client.db(database);
     const collection = this.db.collection('files');
     const findResult = await collection.find({
-      userId: uid,
+      userId: new ObjectId(`${userId}`),
     }).toArray();
     return findResult;
   }
 
-  async findFilesByIdUID(id, uid) {
+  async findFilesByIdUID(id, userId) {
     this.db = this.client.db(database);
     const collection = this.db.collection('files');
     const findResult = await collection.find({
       _id: new ObjectId(`${id}`),
-      userId: uid,
+      userId: new ObjectId(`${userId}`),
     }).toArray();
     return findResult;
   }
@@ -119,13 +119,13 @@ class DBClient {
     return findResult;
   }
 
-  async updateFiles(id, uid, newVal) {
+  async updateFiles(id, userId, newVal) {
     this.db = this.client.db(database);
     const collection = this.db.collection('files');
     await collection.updateOne(
       {
         _id: new ObjectId(`${id}`),
-        userId: uid,
+        userId: new ObjectId(`${userId}`),
       },
       { $set: { isPublic: newVal } },
     );

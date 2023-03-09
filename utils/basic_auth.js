@@ -50,7 +50,9 @@ class BasicAuth {
         const shasum = crypto.createHash('sha1')
           .update(userPwd)
           .digest('hex');
-        if (user.password === shasum) return user;
+        if (user !== undefined) {
+          if (user.password === shasum) return user;
+        }
       }
     }
     return null;
@@ -75,6 +77,8 @@ class BasicAuth {
     if (!token) return false;
     if (typeof token !== 'string') return false;
     const key = `auth_${token}`;
+    const usrID = await redisClient.get(key);
+    if (!usrID) return false;
     await redisClient.del(key);
     return true;
   }

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
 import BasicAuth from '../utils/basic_auth';
 
@@ -146,14 +147,15 @@ class FilesController {
     if (!parentId) {
       if (!page) page = 0;
       else page = Number.parseInt(page, 10);
-      const query = { userId: `${userId}` };
+      const query = { userId: new ObjectId(`${userId}`) };
       const files = await dbClient.findFilesAgg(query, page);
       response.status(200).send(files);
     } else {
       if (!page) page = 0;
       else page = Number.parseInt(page, 10);
-      const query = { userId: `${userId}`, parentId: `${parentId}` };
+      const query = { userId: new ObjectId(`${userId}`), parentId: new ObjectId(`${parentId}`) };
       const files = await dbClient.findFilesAgg(query, page);
+      console.log(files);
       response.status(200).send(files);
     }
   }
