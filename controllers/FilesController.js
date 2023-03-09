@@ -4,6 +4,7 @@ import dbClient from '../utils/db';
 import BasicAuth from '../utils/basic_auth';
 
 const path = require('path');
+const mime = require('mime-types');
 
 let fpath;
 let database;
@@ -176,12 +177,13 @@ class FilesController {
       return;
     }
     const userId = user._id.toString();
-    await dbClient.updateFiles(id, userId, true);
-    const files = await dbClient.findFilesByIdUID(id, userId);
+    let files = await dbClient.findFilesByIdUID(id, userId);
     if (files.length < 1) {
       response.status(404).send({ error: 'Not found' });
       return;
     }
+    await dbClient.updateFiles(id, userId, true);
+    files = await dbClient.findFilesByIdUID(id, userId);
     response.status(200).send({
       id: files[0]._id.toString(),
       userId: files[0].userId,
@@ -204,12 +206,13 @@ class FilesController {
       return;
     }
     const userId = user._id.toString();
-    await dbClient.updateFiles(id, userId, false);
-    const files = await dbClient.findFilesByIdUID(id, userId);
+    let files = await dbClient.findFilesByIdUID(id, userId);
     if (files.length < 1) {
       response.status(404).send({ error: 'Not found' });
       return;
     }
+    await dbClient.updateFiles(id, userId, false);
+    files = await dbClient.findFilesByIdUID(id, userId);
     response.status(200).send({
       id: files[0]._id.toString(),
       userId: files[0].userId,
@@ -217,6 +220,44 @@ class FilesController {
       type: files[0].type,
       isPublic: files[0].isPublic,
       parentId: files[0].parentId,
+    });
+  }
+
+  static async getFile(request, response) {
+    const { id } = request.params;
+
+    if (!id) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+    const files = await dbClient.findFilesByID(id);
+    if (files.length < 1) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+    const file = files[0];
+    const user = await auth.currUser(request);
+
+    if (!file.isPublic && (!user || user._id.toString() !== file.userId)) {
+      response.status(404).send({ error: 'Not found' });
+      return;
+    }
+
+    if (file.type === 'folder') {
+      response.status(400).send({ error: 'A folder doesn\'t have content' });
+      return;
+    }
+
+    fs.access(file.localPath, fs.F_OK, (err) => {
+      if (err) {
+        response.status(404).send({ error: 'Not found' });
+      } else {
+        fs.readFile(file.localPath, (err, data) => {
+          response.setHeader('Content-Type', mime.lookup(file.name));
+          response.writeHead(200);
+          response.end(data);
+        });
+      }
     });
   }
 }

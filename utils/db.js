@@ -62,6 +62,13 @@ class DBClient {
     return findResult;
   }
 
+  async findFilesByID(id) {
+    this.db = this.client.db(database);
+    const collection = this.db.collection('files');
+    const findResult = await collection.find(new ObjectId(`${id}`)).toArray();
+    return findResult;
+  }
+
   async findFilesByPID(id) {
     this.db = this.client.db(database);
     const collection = this.db.collection('files');
@@ -115,7 +122,7 @@ class DBClient {
   async updateFiles(id, uid, newVal) {
     this.db = this.client.db(database);
     const collection = this.db.collection('files');
-    await collection.update(
+    await collection.updateOne(
       {
         _id: new ObjectId(`${id}`),
         userId: uid,
