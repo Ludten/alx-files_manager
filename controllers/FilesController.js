@@ -155,7 +155,6 @@ class FilesController {
       else page = Number.parseInt(page, 10);
       const query = { userId: new ObjectId(`${userId}`), parentId: new ObjectId(`${parentId}`) };
       const files = await dbClient.findFilesAgg(query, page);
-      console.log(files);
       response.status(200).send(files);
     }
   }
@@ -231,7 +230,7 @@ class FilesController {
     const file = files[0];
     const user = await BasicAuth.currUser(request);
 
-    if (!file.isPublic && (!user || user._id.toString() !== file.userId)) {
+    if (!file.isPublic && (!user || user._id.toString() !== file.userId.toString())) {
       response.status(404).send({ error: 'Not found' });
       return;
     }
