@@ -47,7 +47,7 @@ class FilesController {
       return;
     }
 
-    if (file.parentId) {
+    if (file.parentId && (file.parentId !== 0 || file.parentId !== '0')) {
       const users = await dbClient.findFilesByPID(file.parentId);
       if (users.length < 1) {
         response.status(400).send({ error: 'Parent not found' });
@@ -152,11 +152,13 @@ class FilesController {
 
     if (!parentId) {
       if (!page) page = 0;
+      else page = Number.parseInt(page, 10);
       const query = { userId: `${userId}` };
       const files = await dbClient.findFilesAgg(query, page);
       response.status(200).send(files);
     } else {
       if (!page) page = 0;
+      else page = Number.parseInt(page, 10);
       const query = { userId: `${userId}`, parentId: `${parentId}` };
       const files = await dbClient.findFilesAgg(query, page);
       response.status(200).send(files);
@@ -251,9 +253,8 @@ class FilesController {
         response.status(404).send({ error: 'Not found' });
       } else {
         fs.readFile(file.localPath, (err, data) => {
-          response.setHeader('Content-Type', mime.lookup(file.name));
-          response.writeHead(200);
-          response.end(data);
+          response.setHeader('Content-Type', mime.contentType(file.name));
+          response.status(200).send(data);
         });
       }
     });
