@@ -253,7 +253,7 @@ class FilesController {
         response.status(404).send({ error: 'Not found' });
       } else {
         fs.readFile(file.localPath, (err, data) => {
-          response.setHeader('Content-Type', mime.contentType(file.name));
+          response.setHeader('Content-Type', mime.contentType(file.name) || 'text/plain; charset=utf-8');
           response.status(200).send(data);
         });
       }
