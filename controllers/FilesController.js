@@ -130,14 +130,7 @@ class FilesController {
       response.status(404).send({ error: 'Not found' });
       return;
     }
-    response.status(200).send({
-      id: files[0]._id.toString(),
-      userId: files[0].userId,
-      name: files[0].name,
-      type: files[0].type,
-      isPublic: files[0].isPublic,
-      parentId: files[0].parentId,
-    });
+    response.status(200).send(files[0]);
   }
 
   static async getIndex(request, response) {
